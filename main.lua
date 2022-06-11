@@ -137,8 +137,8 @@ function onChatMessage(id, name, message)
 	if message[0] == '/say' then
 		if checkAdmin(identifiers) then
 			if message[1] then
-			message[0] = ''
-			msg = table.concat(message, ' ')
+				message[0] = ''
+				msg = table.concat(message, ' ')
 				MP.SendChatMessage(-1, tostring(msg))
 			else
 				MP.SendChatMessage(id, 'Please provide a message to send to the server.')
@@ -209,10 +209,20 @@ function onChatMessage(id, name, message)
 		if checkAdmin(identifiers) then
 			local players = MP.GetPlayers()
 			for playerID, playerName in pairs(players) do
-				if message[1] == ''..playerID then
-					MP.DropPlayer(message[1])
-					MP.SendChatMessage(-1, playerName..' was kicked from the server.')
-					MP.SendChatMessage(-1, 'Reason: '..message[1])
+				print(playerID, message[1])
+				if message[1] == tostring(playerID) then
+					
+					if message[2] then
+						message[0] = ''
+						message[1] = ''
+						msg = table.concat(message, ' ')
+						MP.DropPlayer(tonumber(playerID), msg)
+						MP.SendChatMessage(-1, playerName..' was kicked from the server.')
+						MP.SendChatMessage(-1, 'Reason: '..msg)
+					else
+						MP.DropPlayer(tonumber(playerID))
+						MP.SendChatMessage(-1, playerName..' was kicked from the server.')
+					end
 				end
 			end
 		else 
@@ -231,14 +241,19 @@ function onChatMessage(id, name, message)
 						-- Do not allow admins to ban admins
 						MP.SendChatMessage(id, '^4You cannot ban another server admin.')
 					else 
-						MP.DropPlayer(message[1])
+						MP.DropPlayer(tonumber(message[1]))
 						local file = io.open("bans.txt", "a");
 						for TYPE, ID in pairs(ids) do
 							file:write(ID, "\n")
 							table.insert (bans, ID);
 						end
 						MP.SendChatMessage(-1, playerName..' was banned.')
-						MP.SendChatMessage(-1, 'Reason: '..message[1])
+						if message[2] then
+							message[0] = ''
+							message[1] = ''
+							msg = table.concat(message, ' ')
+							MP.SendChatMessage(-1, 'Reason: '..msg)
+						end
 					end
 				end
 			end
