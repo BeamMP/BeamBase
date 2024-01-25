@@ -98,17 +98,10 @@ end
 print('LOADED!!!!')
 
 function onChatMessage(id, name, message)
-	local isGuest = true
+	local isGuest = MP.IsPlayerGuest(id)
 	local identifiers = MP.GetPlayerIdentifiers(id)
 	
 	if not allowGuestChat then
-		for TYPE, ID in pairs(identifiers) do
-			print(TYPE)
-			if TYPE == 'beammp' then
-				isGuest = false
-			end
-		end
-		
 		if isGuest and not allowGuestChat then
 			MP.SendChatMessage(id, '^4Sorry Chat for Guest Accounts is Disabled on this server.')
 			return 1
