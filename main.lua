@@ -71,10 +71,11 @@ local bans = {}
 
 function onInit()
 	print('BeamBase Starting!')
-	local bans_file = io.open(pluginPath.."/bans.txt")
+	local bans_file_path = "Resources/Server/" .. pluginPath .. "/bans.txt"
+	local bans_file = io.open(bans_file_path)
 	print('Loading Banned Players List..')
 	if not bans_file then 
-		print('FAILED TO LOAD BANS FILE!!!')
+		print("Failed to load bans.txt from '" .. bans_file_path .. "'!")
 		return
 	end
 	local count = 0
