@@ -258,35 +258,21 @@ function onChatMessage(id, name, message)
 	end
 end
 
-function onPlayerAuth(name, role, isGuest)
+function onPlayerAuth(name, _, isGuest, identifiers)
 	if isGuest and not allowGuests then
 		return "You must be signed in to join this server!"
 	end
-	
-	--local ids = MP.GetPlayerIdentifiers(playerID)
-	
-	if not isGuest and role == "STAFF" then
-
-		--table.insert(admins, 
-	end
-	if not isGuest and role == "MDEV" then
-		
+	local id = identifiers.beammp
+	for _, player in pairs(bans) do
+		if id == player then
+			print('Connecting Player "'..name..'" is banned from the server.')
+			return "You are banned from this server."
+		end
 	end
 end
 
 function onPlayerConnecting(id)
 	print('Player '..MP.GetPlayerName(id)..' ('..id..') connecting.')
-	local identifiers = MP.GetPlayerIdentifiers(id)
-	for TYPE, ID in pairs(identifiers) do
-		--print(TYPE, ID)
-		for _, player in pairs(bans) do
-			if ID == player then
-				print('Connecting Player "'..MP.GetPlayerName(id)..'" is banned from the server.')
-				MP.DropPlayer(id, 'You are banned from the server.')
-				return 1
-			end
-		end
-	end
 end
 
 MP.RegisterEvent("onPlayerAuth","onPlayerAuth")
