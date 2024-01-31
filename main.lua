@@ -71,10 +71,11 @@ local bans = {}
 
 function onInit()
 	print('BeamBase Starting!')
-	local bans_file = io.open(pluginPath.."/bans.txt")
+	local bans_file_path = "Resources/Server/" .. pluginPath .. "/bans.txt"
+	local bans_file = io.open(bans_file_path)
 	print('Loading Banned Players List..')
 	if not bans_file then 
-		print('FAILED TO LOAD BANS FILE!!!')
+		print("Failed to load bans.txt from '" .. bans_file_path .. "'!")
 		return
 	end
 	local count = 0
@@ -97,17 +98,10 @@ end
 print('LOADED!!!!')
 
 function onChatMessage(id, name, message)
-	local isGuest = true
+	local isGuest = MP.IsPlayerGuest(id)
 	local identifiers = MP.GetPlayerIdentifiers(id)
 	
 	if not allowGuestChat then
-		for TYPE, ID in pairs(identifiers) do
-			print(TYPE)
-			if TYPE == 'beammp' then
-				isGuest = false
-			end
-		end
-		
 		if isGuest and not allowGuestChat then
 			MP.SendChatMessage(id, '^4Sorry Chat for Guest Accounts is Disabled on this server.')
 			return 1
@@ -264,35 +258,21 @@ function onChatMessage(id, name, message)
 	end
 end
 
-function onPlayerAuth(name, role, isGuest)
+function onPlayerAuth(name, _, isGuest, identifiers)
 	if isGuest and not allowGuests then
 		return "You must be signed in to join this server!"
 	end
-	
-	--local ids = MP.GetPlayerIdentifiers(playerID)
-	
-	if not isGuest and role == "STAFF" then
-
-		--table.insert(admins, 
-	end
-	if not isGuest and role == "MDEV" then
-		
+	local id = identifiers.beammp
+	for _, player in pairs(bans) do
+		if id == player then
+			print('Connecting Player "'..name..'" is banned from the server.')
+			return "You are banned from this server."
+		end
 	end
 end
 
 function onPlayerConnecting(id)
 	print('Player '..MP.GetPlayerName(id)..' ('..id..') connecting.')
-	local identifiers = MP.GetPlayerIdentifiers(id)
-	for TYPE, ID in pairs(identifiers) do
-		--print(TYPE, ID)
-		for _, player in pairs(bans) do
-			if ID == player then
-				print('Connecting Player "'..MP.GetPlayerName(id)..'" is banned from the server.')
-				MP.DropPlayer(id, 'You are banned from the server.')
-				return 1
-			end
-		end
-	end
 end
 
 MP.RegisterEvent("onPlayerAuth","onPlayerAuth")
